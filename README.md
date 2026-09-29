@@ -64,6 +64,22 @@ Each script includes investigation queries and documented decisions alongside th
 
 ---
 
+## Notebooks
+
+`notebooks/01_eda_supply_chain.ipynb` — exploratory analysis on top of the warehouse: negative-profit orders, delivery time distribution by shipping mode, discount rate vs. profit margin correlation, and an OLS regression testing what predicts profit ratio at the row level.
+
+Connects to the warehouse via environment variables (never hardcoded):
+
+```bash
+export DB_USER=your_local_user
+export DB_NAME=order_fulfillment
+# optional, default shown:
+export DB_HOST=localhost
+export DB_PORT=5432
+```
+
+---
+
 ## Setup
 
 **Prerequisites:** PostgreSQL 16, Python 3.10+
@@ -83,6 +99,8 @@ pip install -r requirements.txt
 # Load into PostgreSQL as supply_chain.raw_dataco
 
 # 4. Run SQL scripts in order (00 → 06)
+
+# 5. Set DB_USER / DB_NAME (see Notebooks section) and run the EDA notebook
 ```
 
 ---
