@@ -4,9 +4,22 @@
 
 ---
 
+## Key findings
+
+Analysis of 180,519 order items reveals:
+
+- **Only 45.17% of orders are delivered on-time-in-full (OTIF).** More than half miss the fulfillment target.
+- **Premium shipping is the least reliable.** First Class has the *highest* late-delivery rate of all shipping modes — the opposite of what customers paying for it would expect.
+- **Discounting doesn't explain the margin problem.** Discount rate has near-zero correlation with profit margin at the order level (OLS regression, R² = 0.000), and loss-making orders aren't concentrated in high-discount bands. Profit erosion comes from elsewhere in the cost structure, not pricing.
+- **Late delivery is systemic, not regional.** The late-delivery rate sits around 55% across every market and customer segment. The fix is operational, not a problem with one geography.
+
+Full write-up: [`docs/executive_summary.pdf`](docs/executive_summary.pdf) · [`docs/business_findings.pdf`](docs/business_findings.pdf) · [`docs/technical_case_study.pdf`](docs/technical_case_study.pdf)
+
+---
+
 ## What this project does
 
-Transforms 180,519 raw supply chain order records into a clean PostgreSQL star schema warehouse, then surfaces operational KPIs through a Power BI dashboard — late delivery risk, profit by segment, fulfillment performance by region and shipping mode.
+Transforms 180,519 raw supply chain order records into a clean PostgreSQL star schema warehouse, then surfaces the findings above through a Power BI dashboard and a Python EDA notebook.
 
 ---
 
@@ -16,22 +29,14 @@ Transforms 180,519 raw supply chain order records into a clean PostgreSQL star s
 |---|---|
 | Warehouse | PostgreSQL 16 |
 | Transformation | SQL (pure — no dbt) |
-| Analysis | Python (pandas, matplotlib, seaborn) |
+| Analysis | Python (pandas, matplotlib, seaborn, statsmodels) |
 | Visualization | Power BI Desktop |
 
 ---
 
 ## Star schema
 
-```
-                    dim_date (order_date_key)
-                         │
-dim_customer ──── fact_order_fulfillment ──── dim_product
-                         │
-                    dim_date (shipping_date_key)
-                         │
-              dim_shipping_fulfillment
-```
+![Star schema diagram](docs/star_schema.png)
 
 **Grain:** 1 row = 1 order item (`order_item_id`)
 
@@ -66,7 +71,7 @@ Each script includes investigation queries and documented decisions alongside th
 
 ## Notebooks
 
-`notebooks/01_eda_supply_chain.ipynb` — exploratory analysis on top of the warehouse: negative-profit orders, delivery time distribution by shipping mode, discount rate vs. profit margin correlation, and an OLS regression testing what predicts profit ratio at the row level.
+`notebooks/01_eda_supply_chain.ipynb` — exploratory analysis behind the findings above: negative-profit orders, delivery time distribution by shipping mode, discount rate vs. profit margin correlation, and the OLS regression on profit ratio drivers.
 
 Connects to the warehouse via environment variables (never hardcoded):
 
@@ -80,13 +85,23 @@ export DB_PORT=5432
 
 ---
 
+## Documentation
+
+| Document | Audience |
+|---|---|
+| [`docs/executive_summary.pdf`](docs/executive_summary.pdf) | Non-technical — business findings and recommendations |
+| [`docs/business_findings.pdf`](docs/business_findings.pdf) | Detailed findings behind the KPIs |
+| [`docs/technical_case_study.pdf`](docs/technical_case_study.pdf) | Technical — architecture and design decisions |
+
+---
+
 ## Setup
 
 **Prerequisites:** PostgreSQL 16, Python 3.10+
 
 ```bash
 # 1. Clone
-git clone https://github.com/YOUR_USERNAME/supply-chain-control-tower.git
+git clone https://github.com/franmerchan2-alt/supply-chain-control-tower.git
 cd supply-chain-control-tower
 
 # 2. Python environment
@@ -118,3 +133,9 @@ Power BI dashboard connected to the PostgreSQL warehouse. Screenshots in `dashbo
 | P1 — Supply Chain Control Tower | Descriptive analytics + warehouse | ✅ Complete |
 | P2 — Predictive Operations Analytics | Demand forecasting + lead-time risk (scikit-learn, statsmodels) | 🔜 Next |
 | P3 — Optimization & Decision Models | Route + inventory optimization (OR-Tools) | 📋 Planned |
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE).
